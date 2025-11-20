@@ -26,6 +26,7 @@ Ce projet utilise **pytest** et le **Page Object Model (POM)** pour tester un si
    - **GeckoDriver** (pour Firefox)
    - **EdgeDriver** (pour Edge)
 
+
    > Assurez-vous que ces fichiers `.exe` sont dans votre `PATH` système **ou** placez-les à la racine du projet.
 
 ---
