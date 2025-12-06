@@ -8,12 +8,10 @@ class InventoryPage(BasePage):
 
     # On cible tous les blocs "article" qui ont la classe 'inventory_item'
     INVENTORY_ITEMS = (By.CLASS_NAME, "inventory_item")
-    
-    # Le titre du premier produit (ex: Sauce Labs Backpack)
-    FIRST_PRODUCT_TITLE = (By.CSS_SELECTOR, ".inventory_item:nth-of-type(1) .inventory_item_name")
-    
+        
     # Le bouton "Add to cart" du premier produit
-    ADD_TO_CART_BTN_1 = (By.CSS_SELECTOR, ".inventory_item:nth-of-type(1) button")
+    ADD_TO_CART_BTNS = (By.CLASS_NAME, "btn_primary")
+    REMOVE_FROM_CART_BTNS = (By.CLASS_NAME, "btn_secondary")
     
     # Le bouton du panier en haut à droite
     CART_ICON = (By.CLASS_NAME, "shopping_cart_link")
@@ -31,14 +29,19 @@ class InventoryPage(BasePage):
         produits = self.driver.find_elements(*self.INVENTORY_ITEMS)
         return len(produits)
 
-    def ajouter_premier_produit_au_panier(self):
-        """Clique sur le bouton 'Add to cart' du premier produit."""
-        self.cliquer(self.ADD_TO_CART_BTN_1)
+    def ajouter_produit_au_panier(self, index=0):
+        """Clique sur le bouton 'Add to cart' d'un produit spécifique.
+        """
+        boutons = self.driver.find_elements(*self.ADD_TO_CART_BTNS)
+        if index < len(boutons):
+            boutons[index].click()
 
-    def obtenir_titre_premier_produit(self):
-        """Récupère le texte du premier produit (ex: Sauce Labs Backpack)."""
-        element = self.attendre_element(self.FIRST_PRODUCT_TITLE)
-        return element.text
+    def retirer_produit_du_panier(self, index=0):
+        """Clique sur le bouton 'Remove' d'un produit spécifique.
+        """
+        boutons = self.driver.find_elements(*self.REMOVE_FROM_CART_BTNS)
+        if index < len(boutons):
+            boutons[index].click()
 
     def obtenir_nombre_articles_panier(self):
         """Récupère le chiffre affiché sur le panier (Badge rouge)."""
@@ -52,4 +55,4 @@ class InventoryPage(BasePage):
 
     def aller_au_panier(self):
         """Clique sur l'icône du panier."""
-        self.cliquer(self.CART_ICON)
+        self.cliquer(*self.CART_ICON)
