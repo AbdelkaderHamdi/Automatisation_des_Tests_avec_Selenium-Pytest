@@ -59,6 +59,7 @@ def test_unsuccessful_login(driver, username, expected_error):
     login_page.charger()
     login_page.se_connecter(username, password)
        # 2. Vérification (Assertion)
+       # 2. Vérification (Assertion)
     error_message = login_page.obtenir_message_erreur()
     print(f"Test d'échec pour {username}. Message d'erreur reçu: {error_message}")
     
