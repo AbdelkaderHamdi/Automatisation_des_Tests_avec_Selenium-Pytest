@@ -29,6 +29,6 @@ class BasePage:
         element.clear()
         element.send_keys(texte)
 
-    def obtenir_titre_page(self):
-        """Retourne le titre de la page actuelle."""
-        return self.driver.title
+    """def obtenir_titre_page(self):
+        Retourne le titre de la page actuelle.
+        return self.driver.title"""

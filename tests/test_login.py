@@ -13,7 +13,7 @@ VALID_PASSWORD = "secret_sauce"
     "performance_glitch_user", 
     "error_user", 
     "visual_user",
-    "locked_out_user",
+    pytest.param("locked_out_user", marks=pytest.mark.xfail(reason="Utilisateur bloqué attendu")), 
     "problem_user"
 ])
 @pytest.mark.functional
@@ -58,10 +58,10 @@ def test_unsuccessful_login(driver, username, expected_error):
     # 1. Action
     login_page.charger()
     login_page.se_connecter(username, password)
-    
-    # 2. Vérification (Assertion)
+       # 2. Vérification (Assertion)
     error_message = login_page.obtenir_message_erreur()
     print(f"Test d'échec pour {username}. Message d'erreur reçu: {error_message}")
     
+    current_url = driver.current_url
     assert error_message == expected_error, \
         f"Le message d'erreur attendu '{expected_error}' n'a pas été trouvé."
