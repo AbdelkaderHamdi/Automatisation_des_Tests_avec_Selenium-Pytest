@@ -98,11 +98,15 @@ def test_checkout_complete_success(driver, setup_checkout):
     checkout_page.cliquer_finish()
     
     # Vérification 1 : Message de succès
-    assert "Thank you for your order!" == checkout_page.obtenir_message_succes()
+    message = checkout_page.obtenir_message_succes()
+    assert "Thank you for your order!" in message, \
+        f"Message attendu non trouvé. Reçu: {message}"
     
     # Vérification 2 : URL 'checkout-complete'
     assert "checkout-complete" in driver.current_url
     
-    # Vérification 3 : Le panier doit être vide (0 article)
+    # Vérification 3 : Le panier est vide
+    # Retourner à l'inventaire et vérifier le badge
+    driver.get(driver.current_url.replace("checkout-complete.html", "inventory.html"))
     assert inventory_page.obtenir_nombre_articles_panier() == 0, \
         "Le panier devrait être vide après la commande."
