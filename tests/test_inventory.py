@@ -35,7 +35,10 @@ def test_remove_item_from_cart(driver):
     inventory_page = InventoryPage(driver)
     
     login_page.charger()
-    login_page.se_connecter("standard_user", "secret_sauce")
+    login_page.se_connecter("problem_user", "secret_sauce")
+
+    # --- 1.1. Action : Ajout au panier ---
+    inventory_page.ajouter_produit_au_panier()
 
     # --- 2. Action : remove depuis panier ---
     inventory_page.retirer_produit_du_panier()
