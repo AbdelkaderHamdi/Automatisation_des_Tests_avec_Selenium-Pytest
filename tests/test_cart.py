@@ -63,3 +63,52 @@ def test_proceed_to_checkout(driver):
     
     # Vérification : on vérifie que l'URL a changé et contient 'checkout-step-one'
     assert "checkout-step-one" in driver.current_url, "Échec de la redirection vers la page de commande."
+
+
+@pytest.mark.functional
+def test_proceed_to_continue_shopping(driver):
+    """
+    Scénario Positif : S'assurer qu'on peut aller à l'étape precedante.
+    """
+    
+    login_page = LoginPage(driver)
+    inventory_page = InventoryPage(driver)
+    cart_page = CartPage(driver)
+    
+    login_page.charger()
+    login_page.se_connecter("standard_user", "secret_sauce")
+    inventory_page.ajouter_produit_au_panier()
+    inventory_page.aller_au_panier()
+    
+    # Action
+    cart_page.cliquer_continue_shopping()
+    
+    # Vérification : on vérifie que l'URL a changé et contient 'checkout-step-one'
+    assert "inventory" in driver.current_url, "Échec de la redirection vers la page de commande."
+
+
+@pytest.mark.functional
+def test_proceed_to_enter_first_article(driver):
+    """
+    Vérifie qu'on peut accéder à la page produit depuis le panier.
+    """
+    login_page = LoginPage(driver)
+    inventory_page = InventoryPage(driver)
+    cart_page = CartPage(driver)
+    
+    login_page.charger()
+    login_page.se_connecter("standard_user", "secret_sauce")
+    inventory_page.ajouter_produit_au_panier()
+    inventory_page.aller_au_panier()
+    
+    # Récupérer le nom AVANT de cliquer
+    nom_dans_panier = cart_page.obtenir_nom_premier_article()
+    
+    # Cliquer pour entrer dans la page produit
+    cart_page.entrer_premier_article()
+    
+    # Récupérer le nom APRÈS navigation
+    nom_dans_details = cart_page.obtenir_nom_article_depuis_page_produit()
+    
+    # Comparer
+    assert nom_dans_panier == nom_dans_details, f"Noms différents: '{nom_dans_panier}' != '{nom_dans_details}'"

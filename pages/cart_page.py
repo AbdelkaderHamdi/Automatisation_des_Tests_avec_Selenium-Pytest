@@ -8,6 +8,9 @@ class CartPage(BasePage):
     # Note : Utiliser des sélecteurs relatifs est souvent plus robuste que nth-child
     # Pour le premier article, on prend simplement le premier élément trouvé par CSS
     FIRST_ITEM_NAME = (By.CSS_SELECTOR, ".cart_item .inventory_item_name")
+
+    DETAILED_PAGE_ITEM_NAME = (By.CSS_SELECTOR, ".inventory_details_name")
+
     REMOVE_BUTTON = (By.CSS_SELECTOR, ".cart_item button.cart_button")
     
     CHECKOUT_BTN = (By.ID, "checkout")
@@ -29,6 +32,16 @@ class CartPage(BasePage):
         """Récupère le nom du premier article pour vérification."""
         # On attend que l'élément soit visible avant de lire le texte
         return self.attendre_element(self.FIRST_ITEM_NAME).text
+    
+    def obtenir_nom_article_depuis_page_produit(self):
+        """Récupère le nom du premier article pour vérification."""
+        # On attend que l'élément soit visible avant de lire le texte
+        return self.attendre_element(self.DETAILED_PAGE_ITEM_NAME).text
+    
+    def entrer_premier_article(self):
+        """entrer au premier article pour vérification."""
+        # On attend que l'élément soit visible avant de lire le texte
+        return self.cliquer(self.FIRST_ITEM_NAME)
 
     def supprimer_premier_article(self):
         """Clique sur le bouton 'Remove' du premier article."""
@@ -36,3 +49,6 @@ class CartPage(BasePage):
 
     def cliquer_checkout(self):
         self.cliquer(self.CHECKOUT_BTN)
+
+    def cliquer_continue_shopping(self):
+        self.cliquer(self.CONTINUE_SHOPPING_BTN)

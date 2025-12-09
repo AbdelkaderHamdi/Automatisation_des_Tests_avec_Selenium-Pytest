@@ -26,8 +26,8 @@ def driver(request):
 
     if browser_name.lower() == "chrome":
         options = ChromeOptions()
-        #options.add_argument("--headless") # Exécuter sans ouvrir de fenêtre
-        options.add_argument("--start-maximized")
+        options.add_argument("--headless") # Exécuter sans ouvrir de fenêtre
+        #options.add_argument("--start-maximized")
         driver_instance = webdriver.Chrome(options=options)
         
     elif browser_name.lower() == "firefox":
