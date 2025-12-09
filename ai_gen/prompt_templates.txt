@@ -1,0 +1,5 @@
+Generate a Selenium Python test using Pytest and Page Object Model for the following scenario:
+Scenario: {scenario_description}
+Page Object: {page_object_name}
+Methods available: {methods_list}
+Strictly follow the project structure and imports.
