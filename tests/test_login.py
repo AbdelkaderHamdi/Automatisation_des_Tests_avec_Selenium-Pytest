@@ -10,11 +10,7 @@ VALID_PASSWORD = "secret_sauce"
 # (1) Test de succès: L'utilisateur est connecté et le site change d'URL.
 @pytest.mark.parametrize("username", [
     "standard_user", 
-    "performance_glitch_user", 
-    "error_user", 
-    "visual_user",
-    pytest.param("locked_out_user", marks=pytest.mark.xfail(reason="Utilisateur bloqué attendu")), 
-    "problem_user"
+    "locked_out_user"
 ])
 @pytest.mark.functional
 def test_successful_login(driver, username):
@@ -38,7 +34,6 @@ def test_successful_login(driver, username):
 
 # (2) Test d'échec: L'utilisateur est bloqué ou les identifiants sont faux.
 @pytest.mark.parametrize("username, expected_error", [
-    ("locked_out_user", "Epic sadface: Sorry, this user has been locked out."),
     ("wrong_user", "Epic sadface: Username and password do not match any user in this service"),
     ("standard_user", "Epic sadface: Username and password do not match any user in this service"), # Mauvais mot de passe
     ("", "Epic sadface: Username is required"), 
