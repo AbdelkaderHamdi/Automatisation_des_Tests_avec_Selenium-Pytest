@@ -97,7 +97,7 @@ def test_proceed_to_enter_first_article(driver):
     cart_page = CartPage(driver)
     
     login_page.charger()
-    login_page.se_connecter("standard_user", "secret_sauce")
+    login_page.se_connecter("problem_user", "secret_sauce")
     inventory_page.ajouter_produit_au_panier()
     inventory_page.aller_au_panier()
     

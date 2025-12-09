@@ -4,45 +4,105 @@ from pages.inventory_page import InventoryPage
 from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 
-@pytest.mark.state_transition
-def test_successful_full_order(driver):
+# --- FIXTURE : Préparation commune ---
+@pytest.fixture
+def setup_checkout(driver):
     """
-    T-08 (State Transition Test Positif) : 
-    Vérifie le flux de commande complet et la confirmation de succès.
+    Cette fixture s'exécute avant chaque test de ce fichier.
+    Elle connecte l'utilisateur, ajoute un produit, va au panier 
+    et clique sur Checkout.
+    Elle retourne les pages nécessaires aux tests.
     """
-    
-    # Préparation : Connexion, ajout, et aller à l'étape 1
     login_page = LoginPage(driver)
     inventory_page = InventoryPage(driver)
     cart_page = CartPage(driver)
     checkout_page = CheckoutPage(driver)
-    
+
     login_page.charger()
     login_page.se_connecter("standard_user", "secret_sauce")
-    inventory_page.ajouter_premier_produit_au_panier()
+    inventory_page.ajouter_produit_au_panier()
     inventory_page.aller_au_panier()
     cart_page.cliquer_checkout()
+
+    # On retourne un dictionnaire ou un tuple pour y accéder dans les tests
+    return {
+        "checkout": checkout_page,
+        "inventory": inventory_page # Utile pour vérifier le stock à la fin
+    }
+
+# --- TEST 1 : Remplir informations et Continuer (Happy Path) ---
+@pytest.mark.functional
+def test_checkout_step_one_valid(driver, setup_checkout):
+    """Vérifie qu'on peut passer à l'étape 2 avec des infos valides."""
+    checkout_page = setup_checkout["checkout"]
     
-    # --- Étape 1 : Informations ---
-    checkout_page.remplir_informations("Nom", "Prenom", "75001")
+    # Action
+    checkout_page.remplir_informations("John", "Doe", "75000")
     checkout_page.cliquer_continuer()
     
-    # --- Étape 2 : Overview / Vérification des Totaux (T-12, Performance) ---
-    total = checkout_page.obtenir_total_final()
-    tax = checkout_page.obtenir_taxe()
-    
-    # On sait que le prix du sac est 29.99$. 
-    # Le site calcule : 29.99 (prix) + 2.40 (taxe) = 32.39 (total)
-    print(f"Total calculé: {total} (Taxe: {tax})")
-    assert total == 32.39, "Le prix total affiché n'est pas correct."
+    # Vérification : L'URL doit changer pour 'checkout-step-two'
+    assert "checkout-step-two" in driver.current_url, \
+        "La redirection vers l'étape 2 a échoué."
 
+# --- TEST 2 : Informations manquantes (Negative Path) ---
+@pytest.mark.functional
+def test_checkout_step_one_missing_info(driver, setup_checkout):
+    """Vérifie qu'on ne peut PAS continuer si des infos manquent."""
+    checkout_page = setup_checkout["checkout"]
+    
+    # Action : On ne remplit que le prénom, on laisse le reste vide
+    checkout_page.remplir_informations("John", "", "") 
+    checkout_page.cliquer_continuer()
+    
+    # Vérification 1 : On est toujours sur l'étape 1
+    assert "checkout-step-one" in driver.current_url
+    
+    # Vérification 2 : Message d'erreur affiché
+    msg = checkout_page.obtenir_message_erreur()
+    assert "Error: Last Name is required" in msg, \
+        f"Le message d'erreur attendu n'est pas bon. Reçu: {msg}"
+
+# --- TEST 3 : Vérification Dynamique du Total ---
+@pytest.mark.functional
+def test_checkout_overview_total_calculation(driver, setup_checkout):
+    """Vérifie mathématiquement les totaux (Item Total + Tax = Total)."""
+    checkout_page = setup_checkout["checkout"]
+    
+    # Pré-requis : Passer l'étape 1
+    checkout_page.remplir_informations("John", "Doe", "75000")
+    checkout_page.cliquer_continuer()
+    
+    # Récupération des valeurs
+    sous_total_calcule = checkout_page.calculer_somme_sous_total()
+    sous_total_affiche = checkout_page.obtenir_sous_total_affiche()
+    taxe = checkout_page.obtenir_taxe()
+    total_final = checkout_page.obtenir_total_final()
+    
+    # Vérifications Mathématiques
+    assert sous_total_calcule == sous_total_affiche, "Le sous-total affiché ne correspond pas à la somme des articles."
+    
+    total_attendu = round(sous_total_affiche + taxe, 2)
+    assert total_attendu == total_final, \
+        f"Calcul incorrect : {sous_total_affiche} + {taxe} != {total_final}"
+
+# --- TEST 4 : Succès de la commande ---
+@pytest.mark.functional
+def test_checkout_complete_success(driver, setup_checkout):
+    """Vérifie la confirmation finale et que le panier est vidé."""
+    checkout_page = setup_checkout["checkout"]
+    inventory_page = setup_checkout["inventory"]
+    
+    # Pré-requis : Aller jusqu'à la fin
+    checkout_page.remplir_informations("John", "Doe", "75000")
+    checkout_page.cliquer_continuer()
     checkout_page.cliquer_finish()
     
-    # --- Étape 3 : Confirmation ---
-    message_succes = checkout_page.obtenir_message_succes()
-    assert message_succes == "Thank you for your order!", \
-        "Le message de confirmation de commande n'est pas affiché."
+    # Vérification 1 : Message de succès
+    assert "Thank you for your order!" == checkout_page.obtenir_message_succes()
     
-    # Vérifier que le panier est vide (état final)
+    # Vérification 2 : URL 'checkout-complete'
+    assert "checkout-complete" in driver.current_url
+    
+    # Vérification 3 : Le panier doit être vide (0 article)
     assert inventory_page.obtenir_nombre_articles_panier() == 0, \
-        "Le badge panier n'a pas été remis à zéro après la commande."
+        "Le panier devrait être vide après la commande."
