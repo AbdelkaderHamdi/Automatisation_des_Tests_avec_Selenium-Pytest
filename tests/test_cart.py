@@ -23,7 +23,7 @@ def test_remove_item_from_cart(driver):
     # Connexion et ajout d'un article
     login_page.charger()
     login_page.se_connecter("standard_user", "secret_sauce")
-    inventory_page.ajouter_premier_produit_au_panier()
+    inventory_page.ajouter_produit_au_panier()
     
     # Aller au panier (via l'icône)
     inventory_page.aller_au_panier()
@@ -55,7 +55,7 @@ def test_proceed_to_checkout(driver):
     
     login_page.charger()
     login_page.se_connecter("standard_user", "secret_sauce")
-    inventory_page.ajouter_premier_produit_au_panier()
+    inventory_page.ajouter_produit_au_panier()
     inventory_page.aller_au_panier()
     
     # Action

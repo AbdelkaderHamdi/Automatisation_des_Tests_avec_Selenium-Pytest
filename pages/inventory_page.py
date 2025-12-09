@@ -11,6 +11,7 @@ class InventoryPage(BasePage):
         
     # Le bouton "Add to cart" du premier produit
     ADD_TO_CART_BTNS = (By.CLASS_NAME, "btn_primary")
+    FIRST_ADD_TO_CART_BTN = (By.CSS_SELECTOR, ".inventory_item:first-child .btn_primary")
     REMOVE_FROM_CART_BTNS = (By.CLASS_NAME, "btn_secondary")
     
     # Le bouton du panier en haut à droite
@@ -30,11 +31,16 @@ class InventoryPage(BasePage):
         return len(produits)
 
     def ajouter_produit_au_panier(self, index=0):
-        """Clique sur le bouton 'Add to cart' d'un produit spécifique.
-        """
-        boutons = self.driver.find_elements(*self.ADD_TO_CART_BTNS)
-        if index < len(boutons):
-            boutons[index].click()
+        """Clique sur le bouton 'Add to cart' d'un produit spécifique."""
+        if index == 0:
+            self.cliquer(self.FIRST_ADD_TO_CART_BTN)
+        else:
+            boutons = self.driver.find_elements(*self.ADD_TO_CART_BTNS)
+            if index < len(boutons):
+                self.driver.execute_script("arguments[0].scrollIntoView();", boutons[index])
+                boutons[index].click()
+        # Vérifier que le badge du panier est mis à jour
+        assert self.obtenir_nombre_articles_panier() > 0, "L'article n'a pas été ajouté au panier."
 
     def retirer_produit_du_panier(self, index=0):
         """Clique sur le bouton 'Remove' d'un produit spécifique.
@@ -55,4 +61,4 @@ class InventoryPage(BasePage):
 
     def aller_au_panier(self):
         """Clique sur l'icône du panier."""
-        self.cliquer(*self.CART_ICON)
+        self.cliquer(self.CART_ICON)
