@@ -7,7 +7,7 @@ def test_login_load_time(driver):
     start_time = time.time()
     
     login_page = LoginPage(driver)
-    login_page.load()
+    login_page.charger()
     
     end_time = time.time()
     load_time = end_time - start_time

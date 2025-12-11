@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
-from config.config import Config
 
 class DriverFactory:
     @staticmethod
@@ -10,7 +9,7 @@ class DriverFactory:
         driver = None
         if browser_name.lower() == "chrome":
             options = ChromeOptions()
-            # options.add_argument("--headless") 
+            options.add_argument("--headless") 
             options.add_argument("--start-maximized")
             driver = webdriver.Chrome(options=options)
         elif browser_name.lower() == "firefox":
@@ -23,6 +22,6 @@ class DriverFactory:
         else:
             raise ValueError(f"Browser '{browser_name}' is not supported.")
         
-        driver.implicitly_wait(Config.IMPLICIT_WAIT)
-        driver.set_page_load_timeout(Config.PAGE_LOAD_TIMEOUT)
+        driver.implicitly_wait(10)
+        driver.set_page_load_timeout(30)
         return driver
