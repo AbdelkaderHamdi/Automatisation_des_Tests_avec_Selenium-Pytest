@@ -79,7 +79,6 @@ def generate_test_cases_with_OpenRouter(user_story):
         "z-ai": "z-ai/glm-4.5-air:free",           # Recommandé
         "mistral": "mistralai/devstral-2512:free",     # Alternative
         "qwen": "qwen/qwen3-coder:free",           # Alternative
-        "llama": "meta-llama/llama-3.2-3b-instruct" ,   # Alternative
         "openai": "openai/gpt-oss-120b:free"    # Alternative
     }
     
