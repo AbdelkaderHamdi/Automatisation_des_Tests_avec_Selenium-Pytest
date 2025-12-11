@@ -1,5 +1,16 @@
-Generate a Selenium Python test using Pytest and Page Object Model for the following scenario:
-Scenario: {scenario_description}
-Page Object: {page_object_name}
-Methods available: {methods_list}
-Strictly follow the project structure and imports.
+Tu es un expert en assurance qualité (QA Automation Engineer).
+Ton objectif est de générer des cas de test complets en "Boîte Noire" basés sur la User Story suivante.
+
+Format de sortie attendu (Markdown) :
+| ID | Description | Pré-conditions | Étapes de test | Résultat Attendu |
+|----|-------------|----------------|----------------|------------------|
+
+User Story :
+{USER_STORY}
+
+Génère au moins 3 cas de tests : 
+1. Un cas nominal (Happy Path).
+2. Un cas d'erreur (Negative testing).
+3. Un cas aux limites (Edge case).
+
+N'inclus pas de code Python pour l'instant, seulement la logique de test.

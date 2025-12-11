@@ -1,7 +1,6 @@
 import pytest
 import time
 from pages.login_page import LoginPage
-from config.config import Config
 
 @pytest.mark.performance
 def test_login_load_time(driver):

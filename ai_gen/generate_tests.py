@@ -1,31 +1,56 @@
 import os
+import google.generativeai as genai
+from dotenv import load_dotenv
 
-# This is a placeholder script. You would need to set your OPENAI_API_KEY environment variable.
+# Charger les variables d'environnement
+load_dotenv()
 
-def generate_test(scenario, page_object, methods):
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("Error: OPENAI_API_KEY not found.")
-        return
+# Configuration de Gemini
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-    with open("ai_gen/prompt_templates.txt", "r") as f:
-        template = f.read()
+def load_prompt_template(filename="prompt_templates.txt"):
+    """Lit le template de prompt depuis le fichier"""
+    base_path = os.path.dirname(__file__)
+    file_path = os.path.join(base_path, filename)
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
 
-    prompt = template.format(
-        scenario_description=scenario,
-        page_object_name=page_object,
-        methods_list=methods
-    )
-
-    # client = openai.OpenAI(api_key=api_key)
-    # response = client.chat.completions.create(
-    #     model="gpt-4",
-    #     messages=[{"role": "user", "content": prompt}]
-    # )
-    # print(response.choices[0].message.content)
+def generate_test_cases(user_story):
+    """Envoie la User Story à Gemini et récupère les cas de test"""
+    model = genai.GenerativeModel('gemini-2.5-flash-lite')
     
-    print("Simulating AI generation...")
-    print(f"Generated prompt:\n{prompt}")
+    # Charger le template et injecter la user story
+    template = load_prompt_template()
+    full_prompt = template.replace("{USER_STORY}", user_story)
+    
+    print("🤖 Génération en cours avec Gemini...")
+    try:
+        response = model.generate_content(full_prompt)
+        return response.text
+    except Exception as e:
+        return f"Erreur lors de la génération : {e}"
+
+def save_output(content, filename="generated_cases.md"):
+    """Sauvegarde le résultat dans le dossier ai_gen"""
+    base_path = os.path.dirname(__file__)
+    file_path = os.path.join(base_path, filename)
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"✅ Cas de tests sauvegardés dans : {file_path}")
 
 if __name__ == "__main__":
-    generate_test("User adds item to cart", "InventoryPage", ["add_first_item_to_cart", "get_cart_badge_count"])
+    # Exemple d'entrée (User Story)
+    my_user_story = """
+    Titre: Connexion utilisateur
+    En tant qu'utilisateur enregistré,
+    Je veux me connecter à l'application avec mon email et mot de passe,
+    Afin d'accéder à mon tableau de bord.
+    
+    Critères d'acceptation:
+    1. Si l'email et le mot de passe sont valides, rediriger vers le dashboard.
+    2. Si l'email est invalide, afficher "Utilisateur inconnu".
+    3. Si le mot de passe est vide, le bouton de connexion doit être désactivé.
+    """
+    
+    result = generate_test_cases(my_user_story)
+    save_output(result)
