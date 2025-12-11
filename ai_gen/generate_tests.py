@@ -76,14 +76,15 @@ def generate_test_cases_with_OpenRouter(user_story):
     
     # Modèles gratuits disponibles
     models = {
-        "deepseek": "deepseek/deepseek-chat",           # Recommandé
-        "mistral": "mistralai/mistral-7b-instruct",     # Alternative
-        "qwen": "qwen/qwen-2.5-7b-instruct",           # Alternative
-        "llama": "meta-llama/llama-3.2-3b-instruct"    # Alternative
+        "z-ai": "z-ai/glm-4.5-air:free",           # Recommandé
+        "mistral": "mistralai/devstral-2512:free",     # Alternative
+        "qwen": "qwen/qwen3-coder:free",           # Alternative
+        "llama": "meta-llama/llama-3.2-3b-instruct" ,   # Alternative
+        "openai": "openai/gpt-oss-120b:free"    # Alternative
     }
     
     data = {
-        "model": models["deepseek"],  # Changer ici pour tester d'autres modèles
+        "model": models["mistral"],  # Changer ici pour tester d'autres modèles
         "messages": [
             {
                 "role": "user",
@@ -114,15 +115,16 @@ def generate_test_cases_with_OpenRouter(user_story):
 if __name__ == "__main__":
     # Exemple d'entrée (User Story)
     my_user_story = """
-    Titre: Connexion utilisateur
-    En tant qu'utilisateur enregistré,
-    Je veux me connecter à l'application avec mon email et mot de passe,
-    Afin d'accéder à mon tableau de bord.
-    
-    Critères d'acceptation:
-    1. Si l'email et le mot de passe sont valides, rediriger vers le dashboard.
-    2. Si l'email est invalide, afficher "Utilisateur inconnu".
-    3. Si le mot de passe est vide, le bouton de connexion doit être désactivé.
+    Ajout d'un produit au panier
+    Titre : Ajouter un article au panier
+    En tant qu' utilisateur connecté,
+    Je veux pouvoir ajouter un produit spécifique depuis la page des produits à mon panier,
+    Afin d' pouvoir l'acheter plus tard.
+    Critères d'acceptation :
+    Sur la page /inventory.html, chaque produit doit avoir un bouton "Add to cart".
+    Cliquer sur le bouton "Add to cart" pour un produit change le bouton en "Remove" et incrémente le compteur du panier (l'icône du panier en haut à droite).
+    Le compteur du panier doit afficher "1" après avoir ajouté le premier article.
+    Le produit ajouté doit être visible dans le panier lorsque l'utilisateur navigue vers la page du panier.
     """
     
     result = generate_test_cases_with_OpenRouter(my_user_story)

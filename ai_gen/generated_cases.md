@@ -1,13 +1,21 @@
-Voici les cas de test générés en boîte noire basés sur la User Story de connexion utilisateur :
+Voici les cas de test en boîte noire pour la User Story "Ajouter un article au panier" :
 
-| ID | Description | Pré-conditions | Étapes de test | Résultat Attendu |
-|----|-------------|----------------|----------------|------------------|
-| TC-01 | Connexion réussie avec identifiants valides (Happy Path) | 1. L'utilisateur est enregistré dans le système<br>2. L'application est accessible | 1. Accéder à la page de connexion<br>2. Saisir un email valide enregistré<br>3. Saisir le mot de passe correct associé<br>4. Cliquer sur le bouton "Se connecter" | L'utilisateur est redirigé vers son tableau de bord |
-| TC-02 | Tentative de connexion avec email invalide (Negative testing) | 1. L'application est accessible<br>2. L'email testé n'est pas enregistré | 1. Accéder à la page de connexion<br>2. Saisir un email non enregistré<br>3. Saisir un mot de passe quelconque<br>4. Cliquer sur le bouton "Se connecter" | Le message "Utilisateur inconnu" s'affiche |
-| TC-03 | Tentative de connexion avec mot de passe vide (Edge case) | 1. L'application est accessible<br>2. Un email valide est saisi | 1. Accéder à la page de connexion<br>2. Saisir un email valide<br>3. Laisser le champ mot de passe vide<br>4. Essayer de cliquer sur le bouton "Se connecter" | Le bouton "Se connecter" reste désactivé et l'utilisateur n'est pas connecté |
+```markdown
+| ID  | Description                                                                 | Pré-conditions                                                                 | Étapes de test                                                                                                                                 | Résultat Attendu                                                                                                                                                                                                 |
+|-----|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TC1 | **Ajout d'un produit au panier (Happy Path)**                              | - L'utilisateur est connecté.<br>- La page `/inventory.html` est accessible.<br>- Au moins un produit est disponible. | 1. Naviguer vers `/inventory.html`.<br>2. Identifier un produit avec le bouton "Add to cart".<br>3. Cliquer sur "Add to cart".<br>4. Vérifier le bouton et le compteur du panier.<br>5. Naviguer vers le panier. | - Le bouton du produit passe de "Add to cart" à "Remove".<br>- Le compteur du panier affiche "1".<br>- Le produit est visible dans le panier avec les détails corrects (nom, prix, etc.).                                                                 |
+| TC2 | **Tentative d'ajout d'un produit non disponible (Negative Testing)**        | - L'utilisateur est connecté.<br>- La page `/inventory.html` contient un produit en rupture de stock (bouton "Add to cart" désactivé ou masqué). | 1. Naviguer vers `/inventory.html`.<br>2. Tenter de cliquer sur le bouton "Add to cart" d'un produit non disponible (si visible mais désactivé).<br>3. Vérifier le comportement. | - Le bouton ne répond pas au clic (pas d'action).<br>- Aucun changement dans le compteur du panier.<br>- Aucun message d'erreur n'est affiché (ou un message "Produit indisponible" s'affiche si implémenté).                                                  |
+| TC3 | **Ajout multiple du même produit (Edge Case)**                              | - L'utilisateur est connecté.<br>- La page `/inventory.html` est accessible.<br>- Un produit est disponible (sans limite de stock explicite). | 1. Naviguer vers `/inventory.html`.<br>2. Cliquer 3 fois sur "Add to cart" pour le même produit.<br>3. Vérifier le compteur du panier.<br>4. Naviguer vers le panier. | - Le bouton reste sur "Remove" après le premier clic (les clics suivants ne changent pas l'état).<br>- Le compteur du panier affiche "1" (pas d'incrémentation supplémentaire).<br>- Le panier affiche le produit une seule fois (quantité = 1, sauf si la logique métier gère les quantités). |
+| TC4 | **Ajout d'un produit après suppression (Edge Case supplémentaire)**         | - L'utilisateur est connecté.<br>- Un produit a déjà été ajouté au panier (bouton "Remove" visible). | 1. Naviguer vers `/inventory.html`.<br>2. Cliquer sur "Remove" pour supprimer le produit du panier.<br>3. Vérifier que le bouton redevient "Add to cart" et que le compteur est mis à jour.<br>4. Rajouter le produit en cliquant sur "Add to cart". | - Le bouton redevient "Add to cart" après suppression.<br>- Le compteur du panier passe à "0" après suppression, puis à "1" après réajout.<br>- Le produit réapparaît dans le panier avec les détails corrects.                                                                 |
+```
 
-Cas supplémentaires suggérés (non inclus dans le tableau) :
-- Connexion avec mot de passe incorrect (devrait afficher un message d'erreur spécifique)
-- Test de sensibilité à la casse pour l'email/mot de passe
-- Test avec des champs contenant des caractères spéciaux
-- Test de performance avec réponse attendue sous X secondes
+### Explications :
+- **TC1 (Happy Path)** : Vérifie le flux nominal décrit dans la User Story.
+- **TC2 (Negative Testing)** : Teste le comportement avec un produit indisponible (bouton désactivé ou absent).
+- **TC3 (Edge Case)** : Vérifie la gestion des clics multiples sur le même produit (comportement attendu : pas de duplication).
+- **TC4 (Edge Case supplémentaire)** : Teste la réversibilité de l'action (suppression puis réajout).
+
+### Notes :
+- Les critères d'acceptation couvrent implicitement le **TC1** et partiellement le **TC3/TC4**.
+- Pour **TC2**, l'implémentation peut varier (bouton masqué/désactivé/message d'erreur). Le test doit s'adapter à la logique métier réelle.
+- Si la quantité est gérée (ex : incrémentation à chaque clic), **TC3** doit être ajusté pour vérifier que le compteur passe à "3" et que la quantité dans le panier est mise à jour.
