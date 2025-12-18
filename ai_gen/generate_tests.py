@@ -114,15 +114,17 @@ def generate_test_cases_with_OpenRouter(user_story):
 if __name__ == "__main__":
     # Exemple d'entrée (User Story)
     my_user_story = """
-    Titre: Connexion utilisateur
-    En tant qu'utilisateur enregistré,
-    Je veux me connecter à l'application avec mon email et mot de passe,
-    Afin d'accéder à mon tableau de bord.
+     Ajout d'un produit au panier
+    Titre : Ajouter un article au panier
+    En tant qu' utilisateur connecté,
+    Je veux pouvoir ajouter un produit spécifique depuis la page des produits à mon panier,
+    Afin d' pouvoir l'acheter plus tard.
+    Critères d'acceptation :
     
-    Critères d'acceptation:
-    1. Si l'email et le mot de passe sont valides, rediriger vers le dashboard.
-    2. Si l'email est invalide, afficher "Utilisateur inconnu".
-    3. Si le mot de passe est vide, le bouton de connexion doit être désactivé.
+    Sur la page /inventory.html, chaque produit doit avoir un bouton "Add to cart".
+    Cliquer sur le bouton "Add to cart" pour un produit change le bouton en "Remove" et incrémente le compteur du panier (l'icône du panier en haut à droite).
+    Le compteur du panier doit afficher "1" après avoir ajouté le premier article.
+    Le produit ajouté doit être visible dans le panier lorsque l'utilisateur navigue vers la page du panier.
     """
     
     result = generate_test_cases(my_user_story)
