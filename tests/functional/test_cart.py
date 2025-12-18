@@ -2,6 +2,10 @@ import pytest
 from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 from pages.cart_page import CartPage
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
 
 @pytest.mark.functional
 def test_remove_item_from_cart(driver):
@@ -112,3 +116,62 @@ def test_proceed_to_enter_first_article(driver):
     
     # Comparer
     assert nom_dans_panier == nom_dans_details, f"Noms différents: '{nom_dans_panier}' != '{nom_dans_details}'"
+
+@pytest.mark.functional
+def test_add_to_cart_restricted_for_guest(driver):
+    """
+    Vérifier que l'ajout au panier est restreint pour un utilisateur non connecté.
+    1. Un utilisateur n'est PAS connecté au système.
+    2. (Optionnel) L'utilisateur essaie d'accéder directement à `/inventory.html`.
+    """
+
+    # 1. Initialisation des pages
+    login_page = LoginPage(driver)
+    inventory_page = InventoryPage(driver)
+
+    # 2. Tenter d'accéder à la page `/inventory.html`
+    driver.get("https://www.saucedemo.com/inventory.html")
+
+    # 3. Attendre que l'URL soit redirigée
+    WebDriverWait(driver, 10).until(EC.url_to_be("https://www.saucedemo.com/"))
+
+    # 4. Vérification : Redirection vers la page de connexion ou base URL
+    assert driver.current_url == "https://www.saucedemo.com/", "L'utilisateur n'a pas été redirigé vers la page de connexion."
+
+    # 5. Si la page est accessible, tenter d'ajouter un produit au panier
+    if "/inventory" in driver.current_url:
+        inventory_page.ajouter_produit_au_panier()
+
+        # Vérifier que le compteur du panier ne s'incrémente pas
+        compteur_panier = inventory_page.obtenir_nombre_articles_panier()
+        assert compteur_panier == 0, "Le compteur du panier ne devrait pas s'incrémenter pour un utilisateur non connecté."
+
+        # Vérifier qu'aucun produit n'est ajouté au panier
+        assert driver.current_url == "https://www.saucedemo.com/", "L'utilisateur n'a pas été redirigé vers la page de connexion après la tentative d'ajout."
+
+
+
+@pytest.mark.functional
+def test_add_all_products_to_cart(driver):
+    login_page = LoginPage(driver)
+    inventory_page = InventoryPage(driver)
+    cart_page = CartPage(driver)
+
+    login_page.charger()
+    login_page.se_connecter("standard_user", "secret_sauce")
+
+    # Attendre que les produits soient chargés
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located(inventory_page.INVENTORY_ITEMS))
+
+    # Compter les produits
+    nombre_produits = inventory_page.obtenir_nombre_produits()
+    
+    # Action : Ajouter TOUS les produits
+    inventory_page.ajouter_tous_les_produits()
+    
+    # Petite attente explicite pour laisser le badge se mettre à jour
+    time.sleep(2) 
+
+    # Vérification
+    compteur_final = inventory_page.obtenir_nombre_articles_panier()
+    assert compteur_final == nombre_produits, f"Attendu: {nombre_produits}, Obtenu: {compteur_final}"

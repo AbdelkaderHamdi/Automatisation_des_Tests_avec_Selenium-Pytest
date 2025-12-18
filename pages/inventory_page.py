@@ -1,6 +1,8 @@
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
 import re
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class InventoryPage(BasePage):
     # Locators
@@ -21,7 +23,9 @@ class InventoryPage(BasePage):
     def ajouter_produit_au_panier(self, index=0):
         boutons = self.driver.find_elements(*self.ADD_TO_CART_BTNS)
         if index < len(boutons):
-            boutons[index].click()
+            bouton = boutons[index]
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(bouton))
+            bouton.click()
 
     def retirer_produit_du_panier(self, index=0):
         boutons = self.driver.find_elements(*self.REMOVE_FROM_CART_BTNS)
@@ -57,4 +61,10 @@ class InventoryPage(BasePage):
     def cliquer_titre_produit(self, index=0):
         items = self.driver.find_elements(*self.ITEM_NAMES)
         items[index].click()
-    
+    def ajouter_tous_les_produits(self):
+        # On récupère la liste de tous les boutons "Add to cart" actuellement visibles
+        boutons = self.driver.find_elements(*self.ADD_TO_CART_BTNS)
+        for bouton in boutons:
+            # On attend qu'il soit bien cliquable
+            WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(bouton))
+            bouton.click()
